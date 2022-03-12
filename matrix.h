@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <cmath>
+#include <iomanip>
 
 using std::vector;
 using std::string;
@@ -73,13 +74,15 @@ private:
     uint R,C;
     vector<type> elements;
 public:
-void show()
+void show(string str = "")
     {
+        std::cout << str << std::endl;
         printf("[");
         for(uint i = 0; i < R; i++) {
-            printf("[");
+            if(i == 0) printf("[");
+            else printf(" [");
             for(uint j = 0; j < C; j++) {
-                std::cout << at(i,j);
+                std::cout << std::fixed << std::setw(10) << std::right << std::setprecision(3) << at(i,j);
                 if(j != C-1) printf(" ");
             }
             printf("]");
@@ -96,6 +99,7 @@ void show()
     virtual type& at(uint n) {return elements[n];}
     type& operator ()(uint r,uint c) {return at(r,c);}
     BlockMatrix<type> operator ()(int rb,int re,int cb,int ce) {return block(rb,re,cb,ce);}
+    type& operator ()(uint n) {return at(n);}
     type& operator [](uint n) {return at(n);}
     Matrix<type>& reshape(uint r,uint c) {
         R = r;
@@ -320,6 +324,7 @@ public:
     type& at(uint r,uint c) {return *elements[C*r+c];}
     type& at(uint n) {return *elements[n];}
     type& operator ()(uint r,uint c) {return at(r,c);}
+    type& operator ()(uint n) {return at(n);}
     type& operator [](uint n) {return at(n);}
     type*& ptr_at(uint r,uint c) {return elements[C*r+c];}
     uint rows() {return R;}

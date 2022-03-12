@@ -38,15 +38,18 @@ F    row:N     col:dim_u
 using matrix = Matrix<double>;
 class Model{
 protected:
-    uint dim_u,dim_x,dim_mu;
+    uint dim_u,dim_x,dim_c;
     const double h = 10e-6;
 public:
-    Model(uint input_dim,uint state_dim,uint constraint_dim = 0):dim_u(input_dim),dim_x(state_dim),dim_mu(constraint_dim){}
+    Model(uint input_dim,uint state_dim,uint constraint_dim = 0):dim_u(input_dim),dim_x(state_dim),dim_c(constraint_dim){}
     uint dim_input() {return dim_u;}
     uint dim_state() {return dim_x;}
-    uint dim_constraint() {return dim_mu;}
+    uint dim_constraint() {return dim_c;}
+    matrix Constraints(matrix min,matrix max,matrix val,matrix dummy);
     virtual matrix f(matrix x,matrix u,double t = 0.0);
     virtual matrix L(matrix x,matrix u,double t = 0.0);
+    virtual matrix C(matrix x,matrix u,double t = 0.0);
+    virtual double H(matrix x,matrix u,matrix lmd,double t = 0.0);
     virtual matrix phi(matrix x,double t = 0.0);
     virtual matrix phix(matrix x,double t = 0.0);
     virtual matrix Hx(matrix x,matrix u,matrix lmd,double t = 0.0);
@@ -59,12 +62,13 @@ private:
     uint N;
     double dt;
     double zeta;
-    uint dim_u,dim_x,dim_mu;
+    uint dim_u,dim_x,dim_c,dim_U;
 public:
-    NMPC(Model* model,uint step,double dt,double zeta):M(model),N(step),dt(dt),zeta(zeta),dim_u(model->dim_input()),dim_x(model->dim_state()),dim_mu(model->dim_constraint()){}
+    NMPC(Model* model,uint step,double dt,double zeta):M(model),N(step),dt(dt),zeta(zeta),dim_u(model->dim_input()),dim_x(model->dim_state()),dim_c(model->dim_constraint()),dim_U(dim_u+dim_c*2){}
     matrix X(matrix x,matrix U,double t = 0.0);
     matrix LMD(matrix X,matrix U,double t = 0.0);
     matrix F(matrix x,matrix U,double t = 0.0);
+    matrix FU(matrix x,matrix U,double t = 0.0);
     matrix GMRES(matrix x,matrix U,double t = 0.0);
     matrix GRADIENT(matrix x,matrix U,double t = 0.0);
     matrix BFGS(matrix x,matrix U,double t = 0.0);
